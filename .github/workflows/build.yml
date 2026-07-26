@@ -26,11 +26,12 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
-      - name: Generate Keystore
+      - name: Generate Keystore with OpenSSL
         run: |
-          keytool -genkey -v -keystore keystore.jks -storepass android \
-            -alias wazenav -keypass android \
-            -dname "CN=WazeNav, OU=, O=, L=, S=, C=" -validity 365
+          openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem \
+            -days 365 -nodes -subj "/CN=WazeNav"
+          openssl pkcs12 -export -in cert.pem -inkey key.pem \
+            -out keystore.p12 -password pass:android -name wazenav
 
       - name: Build APK
         run: ./gradlew assembleRelease
