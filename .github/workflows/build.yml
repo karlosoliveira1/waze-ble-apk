@@ -10,29 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install JDK
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq openjdk-17-jdk 2>&1 | tail -3
-          java -version 2>&1
-
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Create keystore
-        run: |
-          mkdir -p ~/.android
-          export KT=$(which keytool)
-          echo "keytool at: $KT"
-          $KT -genkey -v -keystore ~/.android/debug.keystore \
-            -storepass android -alias androiddebugkey -keypass android \
-            -dname "CN=Android Debug,O=Android,C=US" -validity 365
-
       - name: Build APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: waze-nav-apk
-          path: app/build/outputs/apk/release/app-release.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
